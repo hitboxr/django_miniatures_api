@@ -9,40 +9,22 @@ from .serializers import MiniSerializer, MiniImageSerializer
 # Create your views here.
 
 
-# @api_view(['GET', 'POST'])
-# @parser_classes([FormParser, MultiPartParser])
-# def mini_list(request):
-#     """
-#     List all miniatures, or create a new miniature.
-#     """
-#     if request.method == 'GET':
-#         miniatures = Mini.objects.prefetch_related('images')
-#         serializer = MiniSerializer(miniatures, many=True)
-#         return Response(serializer.data)
-#     elif request.method == 'POST':
-#         serializer = MiniSerializer(request.data)
-#         if serializer.is_valid():
-#             images = request.FILES.getlist('image')
-#             mini_obj = serializer.save()
-#             for i in images:
-#                 # TODO: error checking for images? it's not handled by the mini serializer.
-#                 #  Maybe make a separate image serializer that's only used for incoming?
-#                 #MiniImage.objects.create(mini=mini_obj, image=i)
-#                 image_serializer = MiniImageSerializer(mini=mini_obj, image=i)
-#                 if image_serializer.is_valid():
-#                     image_serializer.save()
-#                 else:
-#                     return Response(image_serializer.errors, status.HTTP_400_BAD_REQUEST)
-#             return Response(request.POST, status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-#
-#     # TODO: Try running this and find out if we need two serializers, one with image
-#     #  urls as an extra field(for outgoing) and one without them for writing incoming
-#     #  new minis (and handling the images outside the serializer)
-
 class MiniListAPIView(ListCreateAPIView):
     queryset = Mini.objects.prefetch_related('mini_images')
     serializer_class = MiniSerializer
+    parser_classes = [FormParser, MultiPartParser]
+
+    def post(self, request, *args, **kwargs):
+        image_data = request.FILES.getlist('mini_images')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        for image in image_data:
+            image_serializer = MiniImageSerializer(data={'image': image})
+            image_serializer.is_valid(raise_exception=True)
+        mini_obj = serializer.save()
+        for image in image_data:
+            MiniImage.objects.create(mini=mini_obj, image=image)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=self.get_success_headers(serializer.data))
 
 
 @api_view(['GET', 'PUT', 'DELETE'])

@@ -11,16 +11,8 @@ class MiniImageSerializer(serializers.ModelSerializer):
 
 
 class MiniSerializer(serializers.ModelSerializer):
-    mini_images = MiniImageSerializer(many=True)
+    mini_images = MiniImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Mini
         fields = ['name', 'description', 'added', 'modified', 'mini_images']
-
-    def create(self, validated_data):
-        images_data = validated_data.pop('images')
-        mini = Mini.objects.create(**validated_data)
-        for image in images_data:
-            MiniImage.objects.create(mini=mini, **image)
-
-        return mini
