@@ -1,1 +1,1 @@
-"# django_miniatures_api" 
+# django_miniatures_api
