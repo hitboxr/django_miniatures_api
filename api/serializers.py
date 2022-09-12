@@ -10,9 +10,15 @@ class MiniImageSerializer(serializers.ModelSerializer):
         fields = ['image']
 
 
+class MiniImageField(serializers.RelatedField):
+    def to_representation(self, value):
+        rel_path = serializers.ImageField(use_url=True, read_only=True).to_representation(value.image)
+        return self.context.get('request').build_absolute_uri(rel_path)
+
+
 class MiniSerializer(serializers.ModelSerializer):
-    mini_images = MiniImageSerializer(many=True, read_only=True)
+    mini_images = MiniImageField(many=True, read_only=True)
 
     class Meta:
         model = Mini
-        fields = ['name', 'description', 'added', 'modified', 'mini_images']
+        fields = '__all__'
