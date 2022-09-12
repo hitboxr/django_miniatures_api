@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, MultiPartParser
 from .models import Mini, MiniImage
@@ -27,9 +27,9 @@ class MiniListAPIView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=self.get_success_headers(serializer.data))
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def mini_detail(request, pk):
-    pass
+class MiniDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Mini.objects.prefetch_related('mini_images')
+    serializer_class = MiniSerializer
 
 
 @api_view(['GET', 'POST'])
