@@ -15,7 +15,7 @@ class Mini(models.Model):
 
 
 class MiniImage(models.Model):
-    mini = models.ForeignKey(Mini, related_name='images', on_delete=models.CASCADE)
+    mini = models.ForeignKey(Mini, related_name='mini_images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='minis', unique=True)
 
 

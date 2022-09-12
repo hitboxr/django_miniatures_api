@@ -2,19 +2,25 @@ from rest_framework import serializers
 from .models import Mini, MiniImage, Pack
 
 
+class MiniImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True, read_only=True)
+
+    class Meta:
+        model = MiniImage
+        fields = ['image']
+
+
 class MiniSerializer(serializers.ModelSerializer):
-    images = serializers.SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field='url'
-    )
+    mini_images = MiniImageSerializer(many=True)
 
     class Meta:
         model = Mini
-        fields = ['id', 'name', 'description', 'added', 'modified', 'images']
+        fields = ['name', 'description', 'added', 'modified', 'mini_images']
 
+    def create(self, validated_data):
+        images_data = validated_data.pop('images')
+        mini = Mini.objects.create(**validated_data)
+        for image in images_data:
+            MiniImage.objects.create(mini=mini, **image)
 
-class MiniImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MiniImage
-        fields = '__all__'
+        return mini
