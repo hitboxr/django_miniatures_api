@@ -1,18 +1,22 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, parser_classes
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, MultiPartParser
-from .models import Mini, MiniImage
-from .serializers import MiniSerializer, MiniImageSerializer
+from .models import Mini, MiniImage, Pack
+from .serializers import MiniImageSerializer, MiniDetailSerializer, MiniPreviewSerializer, \
+                         PackPreviewSerializer, PackDetailSerializer, PackModifySerializer
 
 # Create your views here.
 
 
 class MiniListAPIView(ListCreateAPIView):
     queryset = Mini.objects.prefetch_related('mini_images')
-    serializer_class = MiniSerializer
     parser_classes = [FormParser, MultiPartParser]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return MiniDetailSerializer
+        return MiniPreviewSerializer
 
     def post(self, request, *args, **kwargs):
         image_data = request.FILES.getlist('mini_images')
@@ -29,14 +33,24 @@ class MiniListAPIView(ListCreateAPIView):
 
 class MiniDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Mini.objects.prefetch_related('mini_images')
-    serializer_class = MiniSerializer
+    serializer_class = MiniDetailSerializer
 
 
-@api_view(['GET', 'POST'])
-def pack_list(request):
-    pass
+class PackListAPIView(ListCreateAPIView):
+    queryset = Pack.objects.prefetch_related('minis')
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return PackModifySerializer
+        return PackPreviewSerializer
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def pack_detail(request):
-    pass
+class PackDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Pack.objects.prefetch_related('minis')
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return PackDetailSerializer
+        if self.request.method == 'POST' or 'PATCH':
+            return PackModifySerializer
+        return PackDetailSerializer
