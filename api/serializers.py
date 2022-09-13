@@ -23,7 +23,7 @@ class MiniPreviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Mini
-        fields = ['id', 'name', 'mini_images', 'added', 'modified']
+        fields = ['id', 'name', 'mini_images', 'added', 'modified', 'url']
 
 
 class PackPreviewSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class PackPreviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pack
-        fields = ['id', 'pack_name', 'pack_thumbnail', 'added', 'modified']
+        fields = ['id', 'pack_name', 'pack_thumbnail', 'added', 'modified', 'url']
 
 
 class MiniDetailSerializer(serializers.ModelSerializer):

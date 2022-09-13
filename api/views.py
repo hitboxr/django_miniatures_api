@@ -51,6 +51,6 @@ class PackDetailAPIView(RetrieveUpdateDestroyAPIView):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return PackDetailSerializer
-        if self.request.method == 'POST' or 'PATCH':
+        if self.request.method == 'PUT' or 'PATCH':
             return PackModifySerializer
         return PackDetailSerializer
