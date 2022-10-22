@@ -5,6 +5,14 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from .models import Mini, MiniImage, Pack
 from .serializers import MiniImageSerializer, MiniDetailSerializer, MiniPreviewSerializer, \
                          PackPreviewSerializer, PackDetailSerializer, PackModifySerializer
+from rest_framework.pagination import PageNumberPagination
+
+
+class VariableSizePageNumberPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 # Create your views here.
 
@@ -12,6 +20,7 @@ from .serializers import MiniImageSerializer, MiniDetailSerializer, MiniPreviewS
 class MiniListAPIView(ListCreateAPIView):
     queryset = Mini.objects.prefetch_related('mini_images')
     parser_classes = [FormParser, MultiPartParser]
+    pagination_class = VariableSizePageNumberPagination
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -38,6 +47,7 @@ class MiniDetailAPIView(RetrieveUpdateDestroyAPIView):
 
 class PackListAPIView(ListCreateAPIView):
     queryset = Pack.objects.prefetch_related('minis')
+    pagination_class = VariableSizePageNumberPagination
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

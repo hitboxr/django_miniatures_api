@@ -37,10 +37,17 @@ class PackPreviewSerializer(serializers.ModelSerializer):
 class MiniDetailSerializer(serializers.ModelSerializer):
     mini_images = MiniImageField(many=True, read_only=True)
     pack = PackPreviewSerializer(read_only=True)
+    # size = serializers.CharField(source='get_size_display')
 
     class Meta:
         model = Mini
         fields = '__all__'
+
+    # def to_representation(self, instance):
+    #     mini = super().to_representation(instance)
+    #     mini['size'] = Mini.Size(mini['size']).label
+    #     return mini
+    #
 
 
 class PackDetailSerializer(serializers.ModelSerializer):

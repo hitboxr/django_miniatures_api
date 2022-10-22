@@ -24,6 +24,7 @@ class Pack(models.Model):
 
 class Mini(models.Model):
     name = models.CharField(max_length=100)
+    # creator_name = models.CharField(max_length=100, blank=True)
     creator_model_id = models.PositiveIntegerField(blank=True, null=True)
     description = models.TextField(blank=True, default='')
     pack = models.ForeignKey(Pack, related_name='minis', on_delete=models.SET_NULL, null=True, blank=True)
@@ -31,14 +32,16 @@ class Mini(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     class Size(models.TextChoices):
+        NONE = 'N'
         TINY = 'T'
         SMALL = 'S'
         MEDIUM = 'M'
         LARGE = 'L'
         HUGE = 'H'
         GARGANTUAN = 'G'
+        COLOSSAL = 'C'
 
-    size = models.CharField(max_length=1, choices=Size.choices, default=Size.MEDIUM)
+    size = models.CharField(max_length=1, choices=Size.choices, default=Size.NONE, blank=False)
 
     class Meta:
         # default to sorting by newest first
